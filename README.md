@@ -27,3 +27,14 @@ terraform init
 terraform plan
 terraform apply
 ```
+
+## Ecs Exec
+
+```
+aws --profile prod ecs execute-command \
+  --cluster atlantis \
+  --container atlantis \
+  --interactive \
+  --command "/bin/bash" \
+  --task task-id
+```
