@@ -18,7 +18,8 @@ module "atlantis" {
   # ECS
   ecs_fargate_spot = true
   policies_arn = [
-    "arn:aws:iam::aws:policy/AdministratorAccess"
+    "arn:aws:iam::aws:policy/AdministratorAccess",
+    aws_iam_policy.ecs_ssmmessages.arn
   ]
 
   # Atlantis
@@ -66,4 +67,27 @@ locals {
 
 data "aws_acm_certificate" "this" {
   domain = var.aws_acm_certificate_this_domain
+}
+
+resource "aws_iam_policy" "ecs_ssmmessages" {
+  name        = "atlantis-ssmmessages"
+  description = "Enable ECS Exec"
+
+  policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "ssmmessages:CreateControlChannel",
+            "ssmmessages:CreateDataChannel",
+            "ssmmessages:OpenControlChannel",
+            "ssmmessages:OpenDataChannel"
+          ],
+          "Resource" : "*"
+        }
+      ]
+    }
+  )
 }
