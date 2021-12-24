@@ -15,6 +15,12 @@ module "atlantis" {
   # ACM (SSL certificate) - Specify ARN of an existing certificate or new one will be created and validated using Route53 DNS
   certificate_arn = data.aws_acm_certificate.this.arn
 
+  # ALB
+  alb_ingress_cidr_blocks = flatten([
+    data.github_ip_ranges.this.hooks_ipv4,
+    var.allow_ip_ranges,
+  ])
+
   # ECS
   ecs_fargate_spot = true
   policies_arn = [
@@ -34,40 +40,6 @@ module "atlantis" {
   ]
 }
 
-data "aws_vpc" "main" {
-  filter {
-    name   = "tag:Name"
-    values = ["main"]
-  }
-}
-
-data "aws_subnet" "public" {
-  count  = length(local.azs)
-  vpc_id = data.aws_vpc.main.id
-
-  filter {
-    name   = "tag:Name"
-    values = ["main-public-${local.azs[count.index]}"]
-  }
-}
-
-data "aws_subnet" "private" {
-  count  = length(local.azs)
-  vpc_id = data.aws_vpc.main.id
-
-  filter {
-    name   = "tag:Name"
-    values = ["main-private-${local.azs[count.index]}"]
-  }
-}
-
-locals {
-  azs = ["ap-northeast-1a", "ap-northeast-1c", "ap-northeast-1d"]
-}
-
-data "aws_acm_certificate" "this" {
-  domain = var.aws_acm_certificate_this_domain
-}
 
 resource "aws_iam_policy" "ecs_ssmmessages" {
   name        = "atlantis-ssmmessages"
