@@ -88,3 +88,26 @@ resource "aws_ecr_repository" "atlantis" {
     scan_on_push = true
   }
 }
+
+resource "aws_ecr_lifecycle_policy" "atlantis" {
+  repository = aws_ecr_repository.atlantis.name
+
+  policy = jsonencode(
+    {
+      "rules" : [
+        {
+          "rulePriority" : 10,
+          "description" : "Keep last 3 images",
+          "selection" : {
+            "tagStatus" : "any",
+            "countType" : "imageCountMoreThan",
+            "countNumber" : 3
+          },
+          "action" : {
+            "type" : "expire"
+          }
+        }
+      ]
+    }
+  )
+}
