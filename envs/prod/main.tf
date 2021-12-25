@@ -38,6 +38,7 @@ module "atlantis" {
   # Atlantis
   atlantis_github_user       = "shonansurvivors"
   atlantis_github_user_token = var.atlantis_github_user_token
+  atlantis_log_level         = "info"
   atlantis_repo_allowlist    = ["github.com/shonansurvivors/*"]
   custom_environment_variables = [
     {
