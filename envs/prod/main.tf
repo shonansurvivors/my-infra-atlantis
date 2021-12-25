@@ -22,7 +22,14 @@ module "atlantis" {
   ])
 
   # ECS
+  atlantis_image   = aws_ecr_repository.atlantis.repository_url
   ecs_fargate_spot = true
+  custom_environment_secrets = [
+    {
+      name      = "AWS_ACCOUNT_ID_MASTER"
+      valueFrom = aws_ssm_parameter.aws_account_id_master.name
+    }
+  ]
   policies_arn = [
     "arn:aws:iam::aws:policy/AdministratorAccess",
     aws_iam_policy.ecs_ssmmessages.arn
@@ -39,7 +46,6 @@ module "atlantis" {
     },
   ]
 }
-
 
 resource "aws_iam_policy" "ecs_ssmmessages" {
   name        = "atlantis-ssmmessages"
@@ -62,4 +68,22 @@ resource "aws_iam_policy" "ecs_ssmmessages" {
       ]
     }
   )
+}
+
+resource "aws_ssm_parameter" "aws_account_id_master" {
+  name  = "/atlantis/envs/master/aws/account_id"
+  type  = "SecureString"
+  value = "dummy"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ecr_repository" "atlantis" {
+  name = "atlantis"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 }
