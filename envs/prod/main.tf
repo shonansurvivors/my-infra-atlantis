@@ -22,7 +22,14 @@ module "atlantis" {
   ])
 
   # ECS
+  atlantis_image   = aws_ecr_repository.atlantis.repository_url
   ecs_fargate_spot = true
+  custom_environment_secrets = [
+    {
+      name      = "AWS_ACCOUNT_ID_MASTER"
+      valueFrom = aws_ssm_parameter.aws_account_id_master.name
+    }
+  ]
   policies_arn = [
     "arn:aws:iam::aws:policy/AdministratorAccess",
     aws_iam_policy.ecs_ssmmessages.arn
@@ -31,6 +38,7 @@ module "atlantis" {
   # Atlantis
   atlantis_github_user       = "shonansurvivors"
   atlantis_github_user_token = var.atlantis_github_user_token
+  atlantis_log_level         = "info"
   atlantis_repo_allowlist    = ["github.com/shonansurvivors/*"]
   custom_environment_variables = [
     {
@@ -39,7 +47,6 @@ module "atlantis" {
     },
   ]
 }
-
 
 resource "aws_iam_policy" "ecs_ssmmessages" {
   name        = "atlantis-ssmmessages"
@@ -58,6 +65,47 @@ resource "aws_iam_policy" "ecs_ssmmessages" {
             "ssmmessages:OpenDataChannel"
           ],
           "Resource" : "*"
+        }
+      ]
+    }
+  )
+}
+
+resource "aws_ssm_parameter" "aws_account_id_master" {
+  name  = "/atlantis/envs/master/aws/account_id"
+  type  = "SecureString"
+  value = "dummy"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ecr_repository" "atlantis" {
+  name = "atlantis"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+resource "aws_ecr_lifecycle_policy" "atlantis" {
+  repository = aws_ecr_repository.atlantis.name
+
+  policy = jsonencode(
+    {
+      "rules" : [
+        {
+          "rulePriority" : 10,
+          "description" : "Keep last 3 images",
+          "selection" : {
+            "tagStatus" : "any",
+            "countType" : "imageCountMoreThan",
+            "countNumber" : 3
+          },
+          "action" : {
+            "type" : "expire"
+          }
         }
       ]
     }
