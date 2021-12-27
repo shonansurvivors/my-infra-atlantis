@@ -76,7 +76,7 @@ resource "aws_iam_policy" "ecs_ssmmessages" {
 }
 
 resource "aws_ssm_parameter" "aws_account_id_master" {
-  name  = "/atlantis/envs/master/aws/account_id"
+  name  = "/atlantis/aws/account_id_master"
   type  = "SecureString"
   value = "dummy"
 
