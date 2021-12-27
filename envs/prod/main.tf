@@ -125,3 +125,21 @@ resource "aws_ecr_lifecycle_policy" "atlantis" {
     }
   )
 }
+
+resource "null_resource" "docker" {
+  provisioner "local-exec" {
+    command = "aws --profile prod ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin ${aws_ecr_repository.atlantis.repository_url}"
+  }
+
+  provisioner "local-exec" {
+    command = "docker build -t atlantis docker"
+  }
+
+  provisioner "local-exec" {
+    command = "docker tag atlantis:latest ${aws_ecr_repository.atlantis.repository_url}:latest"
+  }
+
+  provisioner "local-exec" {
+    command = "docker push ${aws_ecr_repository.atlantis.repository_url}:latest"
+  }
+}
