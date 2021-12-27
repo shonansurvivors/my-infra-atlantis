@@ -28,7 +28,11 @@ module "atlantis" {
     {
       name      = "AWS_ACCOUNT_ID_MASTER"
       valueFrom = aws_ssm_parameter.aws_account_id_master.name
-    }
+    },
+    {
+      name      = "AWS_ACCOUNT_ID_DEV"
+      valueFrom = aws_ssm_parameter.aws_account_id_dev.name
+    },
   ]
   policies_arn = [
     "arn:aws:iam::aws:policy/AdministratorAccess",
@@ -73,6 +77,16 @@ resource "aws_iam_policy" "ecs_ssmmessages" {
 
 resource "aws_ssm_parameter" "aws_account_id_master" {
   name  = "/atlantis/envs/master/aws/account_id"
+  type  = "SecureString"
+  value = "dummy"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "aws_account_id_dev" {
+  name  = "/atlantis/aws/account_id_dev"
   type  = "SecureString"
   value = "dummy"
 
