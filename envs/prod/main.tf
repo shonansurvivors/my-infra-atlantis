@@ -40,16 +40,18 @@ module "atlantis" {
   ]
 
   # Atlantis
-  atlantis_github_user       = "shonansurvivors"
-  atlantis_github_user_token = var.atlantis_github_user_token
-  atlantis_log_level         = "info"
-  atlantis_repo_allowlist    = ["github.com/shonansurvivors/*"]
+  atlantis_github_user             = "shonansurvivors"
+  atlantis_github_user_token       = var.atlantis_github_user_token
+  atlantis_hide_prev_plan_comments = true
+  atlantis_log_level               = "info"
+  atlantis_repo_allowlist          = ["github.com/shonansurvivors/*"]
   custom_environment_variables = [
     {
       "name" : "ATLANTIS_REPO_CONFIG_JSON",
       "value" : jsonencode(yamldecode(file("${path.module}/config.yaml"))),
     },
   ]
+
 }
 
 resource "aws_iam_policy" "ecs_ssmmessages" {
