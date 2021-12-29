@@ -93,21 +93,6 @@ resource "aws_ssm_parameter" "aws_account_id" {
   }
 }
 
-moved {
-  from = aws_ssm_parameter.aws_account_id_master
-  to   = aws_ssm_parameter.aws_account_id["master"]
-}
-
-moved {
-  from = aws_ssm_parameter.aws_account_id_dev
-  to   = aws_ssm_parameter.aws_account_id["dev"]
-}
-
-moved {
-  from = aws_ssm_parameter.aws_account_id_rails_deploy
-  to   = aws_ssm_parameter.aws_account_id["rails_deploy"]
-}
-
 resource "aws_ecr_repository" "atlantis" {
   name = "atlantis"
 
