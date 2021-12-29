@@ -22,8 +22,9 @@ module "atlantis" {
   ])
 
   # ECS
-  atlantis_image   = aws_ecr_repository.atlantis.repository_url
-  ecs_fargate_spot = true
+  atlantis_image                   = aws_ecr_repository.atlantis.repository_url
+  ecs_fargate_spot                 = true
+  ecs_service_force_new_deployment = true
   custom_environment_secrets = [
     {
       name      = "AWS_ACCOUNT_ID_MASTER"
