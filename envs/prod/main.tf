@@ -140,6 +140,10 @@ resource "aws_ecr_lifecycle_policy" "atlantis" {
 }
 
 resource "null_resource" "docker" {
+  triggers = {
+    always_run = timestamp()
+  }
+
   provisioner "local-exec" {
     command = "aws --profile prod ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin ${aws_ecr_repository.atlantis.repository_url}"
   }
