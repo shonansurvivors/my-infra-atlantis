@@ -27,11 +27,15 @@ module "atlantis" {
   custom_environment_secrets = [
     {
       name      = "AWS_ACCOUNT_ID_MASTER"
-      valueFrom = aws_ssm_parameter.aws_account_id_master.name
+      valueFrom = aws_ssm_parameter.aws_account_id["master"].name
     },
     {
       name      = "AWS_ACCOUNT_ID_DEV"
-      valueFrom = aws_ssm_parameter.aws_account_id_dev.name
+      valueFrom = aws_ssm_parameter.aws_account_id["dev"].name
+    },
+    {
+      name      = "AWS_ACCOUNT_ID_RAILS_DEPLOY"
+      valueFrom = aws_ssm_parameter.aws_account_id["rails_deploy"].name
     },
   ]
   policies_arn = [
@@ -77,24 +81,31 @@ resource "aws_iam_policy" "ecs_ssmmessages" {
   )
 }
 
-resource "aws_ssm_parameter" "aws_account_id_master" {
-  name  = "/atlantis/aws/account_id_master"
+resource "aws_ssm_parameter" "aws_account_id" {
+  for_each = local.aws_ssm_parameter.aws_account_id
+
+  name  = "/atlantis/aws/account_id_${each.key}"
   type  = "SecureString"
-  value = "dummy"
+  value = each.value
 
   lifecycle {
     ignore_changes = [value]
   }
 }
 
-resource "aws_ssm_parameter" "aws_account_id_dev" {
-  name  = "/atlantis/aws/account_id_dev"
-  type  = "SecureString"
-  value = "dummy"
+moved {
+  from = aws_ssm_parameter.aws_account_id_master
+  to   = aws_ssm_parameter.aws_account_id["master"]
+}
 
-  lifecycle {
-    ignore_changes = [value]
-  }
+moved {
+  from = aws_ssm_parameter.aws_account_id_dev
+  to   = aws_ssm_parameter.aws_account_id["dev"]
+}
+
+moved {
+  from = aws_ssm_parameter.aws_account_id_rails_deploy
+  to   = aws_ssm_parameter.aws_account_id["rails_deploy"]
 }
 
 resource "aws_ecr_repository" "atlantis" {
