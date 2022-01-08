@@ -8,7 +8,7 @@ repos:
     # branch is an regex matching pull requests by base branch
     # (the branch the pull request is getting merged into).
     # By default, all branches are matched
-    branch: /.*/
+    branch: /^main$/
 
     # apply_requirements sets the Apply Requirements for all repos that match.
     apply_requirements:
@@ -16,7 +16,7 @@ repos:
 
     # workflow sets the workflow for all repos that match.
     # This workflow must be defined in the workflows section.
-    workflow: custom
+    # workflow: custom
 
     # allowed_overrides specifies which keys can be overridden by this repo in
     # its atlantis.yaml file.
@@ -37,10 +37,3 @@ repos:
     delete_source_branch_on_merge: true
 
 # workflows lists server-side custom workflows
-workflows:
-  custom:
-    plan:
-      steps:
-        - run: rm -f .terraform.lock.hcl
-        - init
-        - plan
