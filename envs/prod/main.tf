@@ -22,7 +22,7 @@ module "atlantis" {
   ])
 
   # ECS
-  atlantis_image                   = aws_ecr_repository.atlantis.repository_url
+  atlantis_image                   = "${aws_ecr_repository.atlantis.repository_url}:latest"
   ecs_fargate_spot                 = true
   ecs_service_force_new_deployment = true
   custom_environment_secrets = [
