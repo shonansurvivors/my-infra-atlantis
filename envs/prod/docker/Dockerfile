@@ -1,4 +1,4 @@
-FROM ghcr.io/runatlantis/atlantis:v0.17.6
+FROM ghcr.io/runatlantis/atlantis:latest
 
 RUN apk --no-cache add libintl && \
       apk --no-cache add --virtual .gettext gettext && \
