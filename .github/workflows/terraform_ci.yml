@@ -5,6 +5,6 @@ on:
 
 jobs:
   ci:
-    uses: ${{ github.repository_owner }}/github-actions-workflows/.github/workflows/terraform_ci.yml@main
+    uses: shonansurvivors/github-actions-workflows/.github/workflows/terraform_ci.yml@main
     with:
       terraform_version: 1.1.2
