@@ -21,8 +21,6 @@ jobs:
 
       - name: terraform fmt only created or updated *.tf
         run: |
-          set -euox pipefail
-
           files=($(git diff origin/main...HEAD --diff-filter=d --name-only | grep -E "\.tf$"))
 
           result=""
@@ -32,7 +30,6 @@ jobs:
           done
 
           if [ -n "$result" ]; then
-            echo "result > 0"
             echo "$result"
             exit 1
           fi
