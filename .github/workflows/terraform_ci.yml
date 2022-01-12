@@ -32,6 +32,7 @@ jobs:
           done
 
           if [ -n "$result" ]; then
+            echo "result > 0"
             echo "$result"
             exit 1
           fi
