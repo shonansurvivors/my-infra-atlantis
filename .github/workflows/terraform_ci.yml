@@ -19,6 +19,8 @@ jobs:
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
+      - run: git diff origin/main...HEAD --diff-filter=d --name-only | grep -E "\.tf$"
+
       - name: terraform fmt only created or updated *.tf
         run: |
           files=($(git diff origin/main...HEAD --diff-filter=d --name-only | grep -E "\.tf$"))
