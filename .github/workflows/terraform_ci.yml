@@ -23,9 +23,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          git diff origin/main...HEAD --diff-filter=d --name-only | grep -E "\.tf$" || true
+          files=($(git diff origin/main...HEAD --diff-filter=d --name-only | grep -E "\.tf$" || true))
 
-          result=""
           for file in "${files[@]}"
           do
             result+=$(terraform fmt -list=false -diff -write=false "$file")
