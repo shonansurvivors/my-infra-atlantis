@@ -4,61 +4,31 @@ on:
   pull_request:
 
 jobs:
-  set-matrix:
+  fmt:
     runs-on: ubuntu-20.04
 
     env:
-      TF_ROOT_DIR: .
-
-    outputs:
-      dirs: ${{ steps.set-matrix.outputs.dirs }}
+      TF_VERSION: 1.1.2
 
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: Detect dirs containing created or updated *.tf
-        id: set-matrix
-        run: |
-          dirs=$(git diff HEAD..origin/main --diff-filter=d --name-only | grep -E "\.tf$" | xargs -I {} dirname {} | uniq | jq -R -s -c 'split("\n")[:-1]')
-          echo $dirs
-          echo "::set-output name=dirs::${dirs}"
-
-  tflint:
-    needs: set-matrix
-
-    if: needs.set-matrix.outputs.dirs != '[]'
-
-    runs-on: ubuntu-20.04
-
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix:
-        TF_DIR: ${{ fromJson(needs.set-matrix.outputs.dirs) }}
-
-    env:
-      TF_DIR: ${{ matrix.TF_DIR }}
-      TFLINT_VERSION: v0.34.1
-      TFLINT_AWS_VERSION: 0.11.0
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: terraform-linters/setup-tflint@v1
+      - uses: hashicorp/setup-terraform@v1
         with:
-          tflint_version: ${{ env.TFLINT_VERSION }}
+          terraform_version: ${{ env.TF_VERSION }}
 
-      - name: Run tflint
+      - name: terraform fmt only created or updated *.tf
         run: |
-          cat <<EOF > .tflint.hcl
-          plugin "aws" {
-              enabled = true
-              version = "${{ env.TFLINT_AWS_VERSION }}"
-              source  = "github.com/terraform-linters/tflint-ruleset-aws"
-          }
-          EOF
-          tflint --init
-          tflint
-        working-directory: ${{ env.TF_DIR }}
+          files=($(git diff origin/main...HEAD --diff-filter=d --name-only | grep -E "\.tf$"))
+
+          for file in "${file[@]}"
+          do
+            result+=$(terraform fmt -list=false -diff -write=false "$file")
+          done
+
+          if [ -n "$result" ]; then
+            echo "$result"
+            exit 1
+          fi
