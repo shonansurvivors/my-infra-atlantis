@@ -4,11 +4,13 @@ on:
   pull_request:
 
 jobs:
-  fmt:
+  ci:
     runs-on: ubuntu-20.04
 
     env:
       TF_VERSION: 1.1.2
+      TFLINT_VERSION: v0.34.1
+      TFLINT_AWS_VERSION: 0.11.0
 
     steps:
       - uses: actions/checkout@v2
@@ -35,4 +37,26 @@ jobs:
             echo "$result"
             exit 1
           fi
+        shell: bash
+
+      - uses: terraform-linters/setup-tflint@v1
+        with:
+          tflint_version: ${{ env.TFLINT_VERSION }}
+
+      - name: Put .tflint.hcl in dirs containing created or updated *.tf
+        run: |
+          set -euo pipefail
+
+          dirs=($(git diff origin/main...HEAD --diff-filter=d --name-only | xargs -I {} dirname {} | uniq | grep -E "\.tf$" || true))
+
+          for dir in "${dirs[@]}"
+          do
+            cat <<EOF > ${{ env.GITHUB_WORKSPACE }}.tflint.hcl
+            plugin "aws" {
+              enabled = true
+              version = "${{ env.TFLINT_AWS_VERSION }}"
+              source  = "github.com/terraform-linters/tflint-ruleset-aws"
+            }
+            EOF
+          done
         shell: bash
