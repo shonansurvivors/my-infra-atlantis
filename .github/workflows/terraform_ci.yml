@@ -21,16 +21,16 @@ jobs:
 
       - name: terraform fmt only created or updated *.tf
         run: |
-          files=($(git diff origin/main...HEAD --diff-filter=d --name-only | grep -E "\.tf$"))
-
-          result=""
-          for file in "${files[@]}"
-          do
-            result+=$(terraform fmt -list=false -diff -write=false "$file")
-          done
-
-          if [ -n "$result" ]; then
-            echo "$result"
-            exit 1
-          fi
+          files=$(git diff origin/main...HEAD --diff-filter=d --name-only | grep -E "\.tf$")
+#
+#          result=""
+#          for file in "${files[@]}"
+#          do
+#            result+=$(terraform fmt -list=false -diff -write=false "$file")
+#          done
+#
+#          if [ -n "$result" ]; then
+#            echo "$result"
+#            exit 1
+#          fi
         shell: bash
