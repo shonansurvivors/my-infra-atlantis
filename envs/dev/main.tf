@@ -1,5 +1,5 @@
 resource "aws_iam_role" "atlantis" {
-  name  = "atlantis"
+  name = "atlantis"
 
   assume_role_policy = data.aws_iam_policy_document.atlantis.source_json
   managed_policy_arns = [
