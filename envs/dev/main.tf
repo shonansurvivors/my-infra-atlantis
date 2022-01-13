@@ -24,7 +24,3 @@ data "aws_iam_policy_document" "atlantis" {
     }
   )
 }
-
-resource "aws_db_instance" "test" {
-  instance_class = "test"
-}
