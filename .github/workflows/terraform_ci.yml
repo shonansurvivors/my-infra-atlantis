@@ -5,6 +5,6 @@ on:
 
 jobs:
   ci:
-    uses: shonansurvivors/github-actions-workflows/.github/workflows/terraform_ci.yml@main
+    uses: shonansurvivors/github-actions-workflows/.github/workflows/terraform_ci.yml@feature/tflint
     with:
       terraform_version: 1.1.2
