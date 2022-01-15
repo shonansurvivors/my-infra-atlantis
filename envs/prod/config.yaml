@@ -37,3 +37,13 @@ repos:
     delete_source_branch_on_merge: true
 
 # workflows lists server-side custom workflows
+workflows:
+  default:
+    plan:
+      steps:
+        - init:
+            extra_args: ["-upgrade"]
+        - plan
+    apply:
+      steps:
+        - apply
