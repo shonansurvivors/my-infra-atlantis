@@ -5,7 +5,7 @@ on:
 
 jobs:
   ci:
-    uses: shonansurvivors/github-actions-workflows/.github/workflows/terraform_ci.yml@main
+    uses: shonansurvivors/github-actions-workflows/.github/workflows/terraform_ci.yml@feature/fix_tflint_path
     with:
       terraform_version: 1.1.2
       tflint_hcl_path: .tflint.hcl
