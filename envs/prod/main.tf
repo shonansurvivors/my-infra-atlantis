@@ -146,4 +146,3 @@ resource "null_resource" "docker" {
     command = "docker push ${aws_ecr_repository.atlantis.repository_url}:latest"
   }
 }
-
