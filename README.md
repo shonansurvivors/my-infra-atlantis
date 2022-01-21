@@ -11,11 +11,7 @@ cd envs/prod
 ```
 
 ```
-tfenv use
-```
-
-```
-cp terraform.tfvars.examle terraform
+cp terraform.tfvars.examle terraform.tfvars
 ```
 
 ```
