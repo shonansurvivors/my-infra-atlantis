@@ -40,6 +40,6 @@ jobs:
 
       - uses: aquasecurity/tfsec-pr-commenter-action@274ee49538d9c31dcac422b27ba0b499d65a471c #v1.0.3
         with:
-          github_token: ${{ github.token }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           tfsec_version: latest
           working_directory: ${{ matrix.TF_DIR }}
