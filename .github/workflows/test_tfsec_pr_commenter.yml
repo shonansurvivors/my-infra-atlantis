@@ -1,0 +1,45 @@
+name: Terraform CI test
+
+on:
+  pull_request:
+
+jobs:
+  set-matrix:
+    runs-on: ubuntu-20.04
+
+    outputs:
+      dirs: ${{ steps.set-matrix.outputs.dirs }}
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Detect dirs containing created or updated *.tf
+        id: set-matrix
+        run: |
+          dirs=$(git diff origin/main...HEAD --diff-filter=d --name-only | grep -E "\.tf$" | xargs -I {} dirname {} | uniq | jq -R -s -c 'split("\n")[:-1]')
+          echo $dirs
+          echo "::set-output name=dirs::${dirs}"
+
+  tfsec:
+    needs: set-matrix
+
+    if: needs.set-matrix.outputs.dirs != '[]'
+
+    runs-on: ubuntu-20.04
+
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        TF_DIR: ${{ fromJson(needs.set-matrix.outputs.dirs) }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: aquasecurity/tfsec-pr-commenter-action@274ee49538d9c31dcac422b27ba0b499d65a471c #v1.0.3
+        with:
+          github_token: ${{ github.token }}
+          tfsec_version: latest
+          working_directory: ${{ matrix.TF_DIR }}
