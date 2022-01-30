@@ -8,3 +8,5 @@ on:
 jobs:
   tfupdate:
     uses: shonansurvivors/github-actions-workflows/.github/workflows/tfupdate.yml@main
+    with:
+      tfupdate_target: '["terraform","aws","github"]'
