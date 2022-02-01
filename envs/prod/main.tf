@@ -94,6 +94,7 @@ resource "aws_ssm_parameter" "aws_account_id" {
   }
 }
 
+#tfsec:ignore:aws-ecr-repository-customer-key
 resource "aws_ecr_repository" "atlantis" {
   name = "atlantis"
 
