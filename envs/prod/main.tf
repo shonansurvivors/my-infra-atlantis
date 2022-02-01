@@ -97,6 +97,8 @@ resource "aws_ssm_parameter" "aws_account_id" {
 resource "aws_ecr_repository" "atlantis" {
   name = "atlantis"
 
+  image_tag_mutability = "IMMUTABLE"
+
   image_scanning_configuration {
     scan_on_push = true
   }
