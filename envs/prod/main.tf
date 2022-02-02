@@ -4,6 +4,10 @@ module "atlantis" {
 
   name = "atlantis"
 
+  depends_on = [
+    null_resource.docker
+  ]
+
   # VPC
   vpc_id             = data.aws_vpc.main.id
   private_subnet_ids = data.aws_subnet.private.*.id
@@ -22,7 +26,7 @@ module "atlantis" {
   ])
 
   # ECS
-  atlantis_image                   = "${aws_ecr_repository.atlantis.repository_url}:latest"
+  atlantis_image                   = "${aws_ecr_repository.atlantis.repository_url}:${var.atlantis_image_tag}"
   ecs_fargate_spot                 = true
   ecs_service_force_new_deployment = true
   custom_environment_secrets = [
@@ -94,8 +98,11 @@ resource "aws_ssm_parameter" "aws_account_id" {
   }
 }
 
+#tfsec:ignore:aws-ecr-repository-customer-key
 resource "aws_ecr_repository" "atlantis" {
   name = "atlantis"
+
+  image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {
     scan_on_push = true
@@ -139,10 +146,10 @@ resource "null_resource" "docker" {
   }
 
   provisioner "local-exec" {
-    command = "docker tag atlantis:latest ${aws_ecr_repository.atlantis.repository_url}:latest"
+    command = "docker tag atlantis:latest ${aws_ecr_repository.atlantis.repository_url}:$(git rev-parse --short HEAD)"
   }
 
   provisioner "local-exec" {
-    command = "docker push ${aws_ecr_repository.atlantis.repository_url}:latest"
+    command = "docker push ${aws_ecr_repository.atlantis.repository_url}:$(git rev-parse --short HEAD)"
   }
 }
