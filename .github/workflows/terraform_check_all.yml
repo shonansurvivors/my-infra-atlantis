@@ -1,0 +1,39 @@
+name: Terraform check all
+
+on:
+  workflow_dispatch:
+    inputs:
+      tf_root_dir:
+        description: tf_root_dir
+        required: false
+        type: string
+        default: .
+      tflint_version:
+        description: tflint_version
+        required: false
+        type: string
+        default: latest
+      own_tflint_hcl_exists:
+        description: own_tflint_hcl_exists
+        required: false
+        type: boolean
+        default: false
+      tflint_hcl_path:
+        description: tflint_hcl_path
+        required: false
+        type: string
+        default: .tflint.hcl
+
+jobs:
+  tflint:
+    uses: shonansurvivors/github-actions-workflows/.github/workflows/tflint_all.yml@main
+    with:
+      tf_root_dir: ${{ github.event.inputs.tf_root_dir }}
+      tflint_version: ${{ github.event.inputs.tflint_version }}
+      own_tflint_hcl_exists: ${{ fromJson(github.event.inputs.own_tflint_hcl_exists) }}
+      tflint_hcl_path: ${{ github.event.inputs.tflint_hcl_path }}
+
+  tfsec:
+    uses: shonansurvivors/github-actions-workflows/.github/workflows/tfsec_all.yml@main
+    with:
+      tf_root_dir: ${{ github.event.inputs.tf_root_dir }}
